@@ -23,9 +23,23 @@ for f in flags:
 
 string(REPLACE "\n" ";" TF_COMPILE_FLAGS_LIST ${TF_COMPILE_FLAGS})
 
+file(READ ${CMAKE_SOURCE_DIR}/VERSION APP_VERSION)
+string(STRIP ${APP_VERSION} APP_VERSION)
+
+execute_process(
+  COMMAND git log -1 --format=%h
+  OUTPUT_VARIABLE GIT_HASH
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
+string(STRIP ${GIT_HASH} GIT_HASH)
+
 add_executable(add_app main.cpp)
 target_compile_options(add_app PRIVATE ${TF_COMPILE_FLAGS_LIST})
-target_include_directories(add_app PRIVATE ${TF_LIB_DIR}/include)
+target_include_directories(add_app PRIVATE ${CMAKE_SOURCE_DIR} ${TF_LIB_DIR}/include)
+target_compile_definitions(add_app PRIVATE
+  APP_VERSION="${APP_VERSION}"
+  GIT_HASH="${GIT_HASH}"
+)
 target_link_libraries(add_app PRIVATE
   ${TF_LIB_DIR}/libtensorflow_cc.so.2
   ${TF_LIB_DIR}/libtensorflow_framework.so.2

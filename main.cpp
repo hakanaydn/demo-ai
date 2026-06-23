@@ -6,12 +6,23 @@
 #include <cstdlib>
 #include <iomanip>
 #include <iostream>
+#include <string>
 #include <vector>
 
+#include "version.h"
+
 int main(int argc, char* argv[]) {
+  if (argc == 2 && std::string(argv[1]) == "--version") {
+    std::cout << APP_NAME << " v" << APP_VERSION_STR
+              << " (git: " << GIT_HASH << ")" << std::endl;
+    return 0;
+  }
+
   if (argc != 3) {
     std::cerr << "Kullanim: " << argv[0] << " <sayi1> <sayi2>\n";
-    std::cerr << "  Iki sayi girin (0-10 arasi), toplamlarini tahmin eder.\n";
+    std::cerr << "  " << APP_NAME << " v" << APP_VERSION_STR
+              << " (git: " << GIT_HASH << ")\n";
+    std::cerr << "  Iki sayi girin (0-1000 arasi), toplamlarini tahmin eder.\n";
     return 1;
   }
 
@@ -42,8 +53,8 @@ int main(int argc, char* argv[]) {
   tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT,
                                   tensorflow::TensorShape({1, 2}));
   auto input_map = input_tensor.matrix<float>();
-  input_map(0, 0) = a;
-  input_map(0, 1) = b;
+  input_map(0, 0) = a / 1000.0f;
+  input_map(0, 1) = b / 1000.0f;
 
   std::vector<tensorflow::Tensor> outputs;
   status = bundle.session->Run({{input_name, input_tensor}}, {output_name}, {},
@@ -53,7 +64,7 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  float prediction = outputs[0].flat<float>()(0);
+  float prediction = outputs[0].flat<float>()(0) * 2000.0f;
   float expected = a + b;
   float error = prediction - expected;
   float error_pct = (expected != 0.0f)
