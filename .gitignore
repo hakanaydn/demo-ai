@@ -9,3 +9,6 @@ tflite_include/
 tflite_build/
 CMakeFiles/
 cmake-build-*/
+*.swp
+.vscode/
+.idea/
