@@ -1,0 +1,11 @@
+build/
+saved_model/
+model.tflite
+__pycache__/
+*.pyc
+*.so
+*.tar.gz
+tflite_include/
+tflite_build/
+CMakeFiles/
+cmake-build-*/
